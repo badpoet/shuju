@@ -1,0 +1,12 @@
+//north west corner
+53.3422520000	71.3322500000
+//north east corner
+54.3861470000	139.0343020000
+//south west corner
+16.0781800000	71.3322500000
+//start
+53.3422520000	71.3322500000
+//cumulant(km) totalget
+10.0	25000
+//allready done points
+0

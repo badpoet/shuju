@@ -2,6 +2,8 @@ __author__ = 'badpoet'
 
 import requests
 import json
+import codecs
+from time import sleep
 
 MAX_TRY = 3
 
@@ -67,4 +69,17 @@ class WeatherComClient(object):
 
 if __name__ == "__main__":
     wcc = WeatherComClient()
-    print wcc.fetch_raw("101010100")
+    city_tuples = []
+    f = codecs.open("resources/city_codes.txt", "r", "utf8")
+    g = codecs.open("data/0426", "w", "utf8")
+    for each in f.readlines():
+        cid, p, d, s = each.strip().split(" ")
+        city_tuples.append((cid, p, d, s))
+    for cid, p, d, s, in city_tuples:
+        sleep(1)
+        obj = wcc.fetch_page(cid)
+        print obj
+        s = json.dumps(obj)
+        g.write(s + "\n")
+    g.close()
+    f.close()

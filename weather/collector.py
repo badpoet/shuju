@@ -71,15 +71,18 @@ if __name__ == "__main__":
     wcc = WeatherComClient()
     city_tuples = []
     f = codecs.open("resources/city_codes.txt", "r", "utf8")
-    g = codecs.open("data/0426", "w", "utf8")
     for each in f.readlines():
         cid, p, d, s = each.strip().split(" ")
         city_tuples.append((cid, p, d, s))
-    for cid, p, d, s, in city_tuples:
-        sleep(1)
-        obj = wcc.fetch_page(cid)
-        print obj
-        s = json.dumps(obj)
-        g.write(s + "\n")
-    g.close()
+    k = 0
+    while True:
+        k += 1
+        g = codecs.open("data/0426" + str(k).zfill(2), "w", "utf8")
+        for cid, p, d, s, in city_tuples:
+            sleep(1)
+            obj = wcc.fetch_page(cid)
+            print "Round", k, obj["cityname"], obj["time"]
+            s = json.dumps(obj)
+            g.write(s + "\n")
+        g.close()
     f.close()

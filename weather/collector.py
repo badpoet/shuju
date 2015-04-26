@@ -82,8 +82,12 @@ if __name__ == "__main__":
             sleep(1)
             obj = wcc.fetch_page(cid)
             if obj:
-                print "Round", k, obj["cityname"].encode("utf8"), obj["time"]
-                s = json.dumps(obj)
+                try:
+                    print "Round", k, obj["cityname"].encode("utf8"), obj["time"]
+                except Exception, e:
+                    print e
+                    print obj
+                s = json.dumps(obj, ensure_ascii=False)
             else:
                 print "Round", k, "failed on", cid
                 s = "failed " + cid

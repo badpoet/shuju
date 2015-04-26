@@ -83,7 +83,7 @@ if __name__ == "__main__":
             obj = wcc.fetch_page(cid)
             if obj:
                 try:
-                    print "Round", k, obj["cityname"].encode("utf8"), obj["time"]
+                    print "Round", k, obj["cityname"].encode("utf8"), obj["time"].encode("utf8")
                 except Exception, e:
                     print e
                     print obj

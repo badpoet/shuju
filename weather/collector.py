@@ -5,7 +5,7 @@ import json
 import codecs
 from time import sleep
 
-MAX_TRY = 3
+MAX_TRY = 10
 
 class WrongPage(Exception):
 
@@ -40,8 +40,8 @@ class WeatherComClient(object):
         except Exception, e:
             raise WrongPage()
 
-    def fetch_once(self, url, headers):
-        resp = requests.get(url, headers=headers, timeout=2)
+    def fetch_once(self, url, headers, timeout=5):
+        resp = requests.get(url, headers=headers, timeout=timeout)
         if resp.status_code != 200:
             raise WrongPage()
         return self.analyse_html(resp.text)
@@ -54,7 +54,7 @@ class WeatherComClient(object):
         last_exception = None
         while cnt < MAX_TRY:
             try:
-                return self.fetch_once(self.make_url(cid), self.make_headers(cid))
+                return self.fetch_once(self.make_url(cid), self.make_headers(cid), 5 + cnt * 2)
             except requests.Timeout, e:
                 cnt += 1
                 last_exception = e
@@ -81,8 +81,12 @@ if __name__ == "__main__":
         for cid, p, d, s, in city_tuples:
             sleep(1)
             obj = wcc.fetch_page(cid)
-            print "Round", k, obj["cityname"], obj["time"]
-            s = json.dumps(obj)
+            if obj:
+                print "Round", k, obj["cityname"].encode("utf8"), obj["time"]
+                s = json.dumps(obj)
+            else:
+                print "Round", k, "failed on", cid
+                s = "failed " + cid
             g.write(s + "\n")
         g.close()
     f.close()

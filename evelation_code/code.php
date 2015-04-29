@@ -162,6 +162,7 @@ function decode( $info, array $request_arr )
 	return $res_arr;
 }
 
+$count_file = fopen("count.txt", "a") or die("Unable to open result file!");
 $result_file = fopen("result.txt", "a") or die("Unable to open result file!");
 $config_file =  fopen("config.txt", "r") or die("Unable to open config file!");
 
@@ -218,23 +219,28 @@ $last_lat = $current_loc->lat;
 for( $i = 0; $i < $config->total; $i+=10 )
 {
 	//todo
+	sleep(1);
+	
 	$arr = $config->get_next_ten( $current_loc );
 	$current_loc->setloc($arr[9]->lat,$arr[9]->lng);
 	$tmp = file_get_contents(get_url($request_base,loc_glue( $arr ),$other_arg));
 	$restmp = decode($tmp,$arr);
 	fwrite($result_file, $restmp[0]);
+	fwrite($count_file, $i."\n");
+	echo   $i."\n";
 	if( $restmp[1] != 0 )
 	{
 		echo $restmp[1];
 		fclose($result_file);
 		fclose($config_file);
+		fclose($count_file);
 		exit();
 		break;
 	}
 }
 
 //fwrite($myfile, $tmp);
-
+fclose($count_file);
 fclose($result_file);
 fclose($config_file);
 ?>

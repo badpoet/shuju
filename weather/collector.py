@@ -4,6 +4,7 @@ import requests
 import json
 import codecs
 from time import sleep
+from datetime import datetime
 
 MAX_TRY = 10
 
@@ -77,7 +78,8 @@ if __name__ == "__main__":
     k = 0
     while True:
         k += 1
-        g = codecs.open("data/0426" + str(k).zfill(2), "w", "utf8")
+        timestamp = datetime.now().strftime("%m%d%H%M")
+        g = codecs.open("data/" + timestamp, "w", "utf8")
         for cid, p, d, s, in city_tuples:
             sleep(1)
             obj = wcc.fetch_page(cid)

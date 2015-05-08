@@ -6,7 +6,7 @@ import codecs
 from time import sleep
 from datetime import datetime
 
-MAX_TRY = 5
+MAX_TRY = 3
 
 class WrongPage(Exception):
 
@@ -64,6 +64,7 @@ class WeatherComClient(object):
                 last_exception = e
             except Exception, e:
                 print "Are we banned?"
+                cnt += 1
                 silence += 30
                 sleep(silence)
                 last_exception = e

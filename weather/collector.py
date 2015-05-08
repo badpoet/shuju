@@ -6,7 +6,7 @@ import codecs
 from time import sleep
 from datetime import datetime
 
-MAX_TRY = 10
+MAX_TRY = 5
 
 class WrongPage(Exception):
 
@@ -52,16 +52,20 @@ class WeatherComClient(object):
 
     def fetch_page(self, cid):
         cnt = 0
+        silence = 30
         last_exception = None
+        timeout = 2
         while cnt < MAX_TRY:
             try:
-                return self.fetch_once(self.make_url(cid), self.make_headers(cid), 5 + cnt * 2)
+                return self.fetch_once(self.make_url(cid), self.make_headers(cid), timeout)
             except requests.Timeout, e:
                 cnt += 1
+                timeout += 5
                 last_exception = e
-            except WrongPage, e:
+            except Exception, e:
                 print "Are we banned?"
-                cnt += 1
+                silence += 30
+                sleep(silence)
                 last_exception = e
         print last_exception
 
@@ -75,24 +79,28 @@ if __name__ == "__main__":
     for each in f.readlines():
         cid, p, d, s = each.strip().split(" ")
         city_tuples.append((cid, p, d, s))
+    f.close()
     k = 0
+    tot = len(city_tuples)
     while True:
         k += 1
         timestamp = datetime.now().strftime("%m%d%H%M")
         g = codecs.open("data/" + timestamp, "w", "utf8")
+        cnt = 0
         for cid, p, d, s, in city_tuples:
-            sleep(1)
+            cnt += 1
+            sleep(0.5)
             obj = wcc.fetch_page(cid)
+            pr = "Round " + str(k) + " " + str(cnt) + "/" + str(tot)
             if obj:
                 try:
-                    print "Round", k, obj["cityname"].encode("utf8"), obj["time"].encode("utf8")
+                    print pr, obj["cityname"].encode("utf8"), obj["time"].encode("utf8")
                 except Exception, e:
                     print e
                     print obj
                 s = json.dumps(obj, ensure_ascii=False)
             else:
-                print "Round", k, "failed on", cid
+                print pr, "failed on", cid
                 s = "failed " + cid
             g.write(s + "\n")
         g.close()
-    f.close()

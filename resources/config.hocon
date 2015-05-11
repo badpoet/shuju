@@ -1,0 +1,17 @@
+db {
+    mongo {
+        host = localhost
+        port = 27017
+        user = rocks
+        pw = "errorno404"
+        db = wshuju
+    }
+
+    mysql {
+        host = localhost
+        port = 3306
+        user = rocks
+        passwd = "PKUweather123$%^"
+        db = wshuju
+    }
+}

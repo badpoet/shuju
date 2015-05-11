@@ -1,0 +1,4 @@
+pyhocon
+requests
+json
+mysql-python

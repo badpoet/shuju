@@ -127,7 +127,7 @@ class Pm25InClient(object):
         params = { "token": self.token, "stations": "no" }
         res25 = []
         res10 = []
-        ts = "data0511/" + datetime.now().strftime("%m%d%H")
+        ts = "weather/data/" + datetime.now().strftime("%m%d%H")
         for each in self.city_list:
             print each
             params["city"] = each

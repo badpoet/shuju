@@ -7,6 +7,7 @@ __pycache__/
 tmp
 out
 weather/data
+data0511
 
 # C extensions
 *.so

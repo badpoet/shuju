@@ -169,6 +169,7 @@ def sleep_to_next_hour():
 
 if __name__ == "__main__":
     pm25 = Pm25InClient()
-    pm25.fetch_all("pm2_5")
-    pm25.fetch_all("pm10")
-    sleep_to_next_hour()
+    while True:
+        pm25.fetch_all("pm2_5")
+        pm25.fetch_all("pm10")
+        sleep_to_next_hour()

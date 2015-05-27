@@ -129,7 +129,7 @@ class Pm25InClient(object):
         res10 = []
         ts = "weather/data/" + datetime.now().strftime("%m%d%H")
         for each in self.city_list:
-            print each
+            print each.encode("utf8")
             params["city"] = each
             cnt = 0
             while cnt < MAX_TRY:
@@ -149,7 +149,7 @@ class Pm25InClient(object):
                         "date": r["time_point"].split("T")[0]
                     })
                 except WrongPage, e:
-                    print "Failed on", each
+                    print "Failed on", each.encode("utf8")
                 except Exception, e:
                     print e
                     cnt += 1

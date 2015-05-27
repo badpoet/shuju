@@ -125,8 +125,7 @@ class Pm25InClient(object):
     def fetch_all(self, type_key):
         MAX_TRY = 3
         params = { "token": self.token, "stations": "no" }
-        res25 = []
-        res10 = []
+        res = []
         ts = "weather/data/" + datetime.now().strftime("%m%d%H")
         idx = 0
         for each in self.city_list:
@@ -138,12 +137,13 @@ class Pm25InClient(object):
                 cnt += 1
                 try:
                     if type_key == "pm2_5":
-                        r = requests.get(self.pm25, params=params).json()[0]
+                        r = requests.get(self.pm25, params=params).json()
                     else:
-                        r = requests.get(self.pm10, params=params).json()[0]
+                        r = requests.get(self.pm10, params=params).json()
                     if "error" in r:
                         raise WrongPage()
-                    res10.append({
+                    r = r[0]
+                    res.append({
                         "city": each,
                         "type": type_key,
                         "value": float(r[type_key]),
@@ -158,7 +158,7 @@ class Pm25InClient(object):
                     print e
                     cnt += 1
 
-        json.dump(res25, codecs.open(ts + type_key, "w", "utf8"), ensure_ascii=False)
+        json.dump(res, codecs.open(ts + type_key, "w", "utf8"), ensure_ascii=False)
         print "one cycled"
 
 

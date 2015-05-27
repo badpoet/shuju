@@ -8,10 +8,12 @@ from datetime import datetime
 
 MAX_TRY = 3
 
+
 class WrongPage(Exception):
 
     def __str__(self):
         return "Not the correct page."
+
 
 class WeatherCnClient(object):
 
@@ -101,3 +103,68 @@ class WeatherCnClient(object):
                 print pr, "failed on", cid
                 if wrapper:
                     wrapper.log(pr + "failed on " + cid, type="err")
+
+
+class Pm25InClient(object):
+
+    def __init__(self):
+        self.token = "67rst15R8Th4h9sREX7D"
+        self.pm25 = "http://www.pm25.in/api/querys/pm2_5.json"
+        self.pm10 = "http://www.pm25.in/api/querys/pm10.json"
+        self.cities = "http://www.pm25.in/api/querys.json"
+        self.city_list = json.load(codecs.open("resources/pm25cities.json", "r", "utf8"))["cities"]
+
+    def get_cities(self):
+        '''
+        params = { "token": self.token }
+        resp = requests.get(self.cities, params=params)
+        return resp.json()
+        '''
+        return None
+
+    def fetch_all(self, type_key):
+        MAX_TRY = 3
+        params = { "token": self.token, "stations": "no" }
+        res25 = []
+        res10 = []
+        ts = "data0511/" + datetime.now().strftime("%m%d%H")
+        for each in self.city_list:
+            print each
+            params["city"] = each
+            cnt = 0
+            while cnt < MAX_TRY:
+                cnt += 1
+                try:
+                    if type_key == "pm2_5":
+                        r = requests.get(self.pm25, params=params).json()[0]
+                    else:
+                        r = requests.get(self.pm10, params=params).json()[0]
+                    if "error" in r:
+                        raise WrongPage()
+                    res10.append({
+                        "city": each,
+                        "type": type_key,
+                        "value": float(r[type_key]),
+                        "time": r["time_point"].split("T")[1][:-1],
+                        "date": r["time_point"].split("T")[0]
+                    })
+                except WrongPage, e:
+                    print "Failed on", each
+                except Exception, e:
+                    print e
+                    cnt += 1
+
+        json.dump(res25, codecs.open(ts + type_key, "w", "utf8"), ensure_ascii=False)
+        print "one cycled"
+
+
+def sleep_to_next_hour():
+    t = (65 - datetime.now().minute) * 60.0
+    print "sleep", t, "seconds"
+    sleep(t)
+
+if __name__ == "__main__":
+    pm25 = Pm25InClient()
+    pm25.fetch_all("pm2_5")
+    pm25.fetch_all("pm10")
+    sleep_to_next_hour()

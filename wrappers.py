@@ -25,6 +25,7 @@ class WeatherCnWrapper(object):
         "moderate rain": 4,
         "heavy rain": 5,
         "light snow": 2,
+        "moderate snow": 3,
         "snow": 3,
         "snow flurry": 4
     }

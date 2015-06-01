@@ -25,7 +25,6 @@ file_name_list = os.listdir(dir)
 
 
 def make_value(line, type_key):
-    print line
     tks = line.split("\t")
     lat = float(tks[0])
     long = float(tks[1])

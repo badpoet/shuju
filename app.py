@@ -48,3 +48,7 @@ def query(q_type, q_date, q_hour):
         "result": result["value"]
     }
     return json.dumps(res, ensure_ascii=False)
+
+
+if __name__ == "__main__":
+    app.run()

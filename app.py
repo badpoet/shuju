@@ -22,6 +22,7 @@ db = pymongo.Connection(
 # )
 w_col = db["w"]
 
+
 @app.route("/data/<q_type>/<q_date>/<q_hour>", methods=["GET"])
 def query(q_type, q_date, q_hour):
     token = request.args.get("token", "")
@@ -51,4 +52,4 @@ def query(q_type, q_date, q_hour):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, port=9000)

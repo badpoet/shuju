@@ -16,7 +16,7 @@ db = pymongo.Connection(
 #     conf.get_string('db.mongo.pw'),
 # )
 w_col = db["w"]
-w_col.ensure_index([("type_key", pymongo.ASCENDING), ("date", pymongo.ASCENDING), ("hour", pymongo.ASCENDING)])
+w_col.ensure_index([("type_key", pymongo.ASCENDING), ("year", pymongo.ASCENDING), ("date", pymongo.ASCENDING), ("hour", pymongo.ASCENDING)])
 
 dir = sys.argv[1]
 if dir[:-1] != "/":
@@ -58,7 +58,8 @@ for each in file_name_list:
     data_key = {
         "type_key": type_key,
         "date": date,
-        "hour": hour
+        "hour": hour,
+        "year": "2015"
     }
     w_col.update(
         data_key,

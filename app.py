@@ -52,4 +52,4 @@ def query(q_type, q_date, q_hour):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=9000)
+    app.run(host="0.0.0.0", port=9000, debug=True)

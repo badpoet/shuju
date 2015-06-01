@@ -1,4 +1,4 @@
 pyhocon
 requests
-json
+flask
 mysql-python

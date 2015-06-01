@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # FIXME keep token in secret
 
-conf = pyhocon.ConfigFactory.parse_file("resource/config.hocon")
+conf = pyhocon.ConfigFactory.parse_file("resources/config.hocon")
 
 TOKEN = conf.get_string('app.token')
 db = pymongo.Connection(

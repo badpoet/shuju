@@ -37,7 +37,7 @@ def query(q_type, q_date, q_hour):
         "date": q_date,
         "hour": q_hour
     })
-    if result == None:
+    if result == None or "value" not in result or not result["value"]:
         res = {
             "status": "none",
             "result": []
@@ -45,6 +45,6 @@ def query(q_type, q_date, q_hour):
         return json.dumps(res, ensure_ascii=False)
     res = {
         "status": "ok",
-        "result": result
+        "result": result["value"]
     }
     return json.dumps(res, ensure_ascii=False)

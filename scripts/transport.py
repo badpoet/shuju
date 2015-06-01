@@ -42,7 +42,7 @@ def make_value(line, type_key):
 
 for each in file_name_list:
     file_name = dir + each
-    print each
+    print file_name
     each = each.split('.')[0]
     date = each[0:4]
     hour = each[4:6]

@@ -16,7 +16,7 @@ db = pymongo.Connection(
 #     conf.get_string('db.mongo.pw'),
 # )
 w_col = db["w"]
-w_col.ensure_index([("type_key", 1), ("date", 1), ("hour, 1")])
+w_col.ensure_index([("type_key", pymongo.ASCENDING), ("date", pymongo.ASCENDING), ("hour", pymongo.ASCENDING)])
 
 dir = sys.argv[1]
 if dir[:-1] != "/":

@@ -5,7 +5,7 @@ import sys
 import pyhocon
 import pymongo
 
-conf = pyhocon.ConfigFactory.parse_file("resource/config.hocon")
+conf = pyhocon.ConfigFactory.parse_file("resources/config.hocon")
 
 db = pymongo.Connection(
         host=conf.get_string('db.mongo.host'),

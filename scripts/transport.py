@@ -25,6 +25,7 @@ file_name_list = os.listdir(dir)
 
 
 def make_value(line, type_key):
+    print line
     tks = line.split("\t")
     lat = float(tks[0])
     long = float(tks[1])
@@ -49,7 +50,7 @@ for each in file_name_list:
     type_key = each[7:]
 
     f = open(file_name, "r")
-    values = [ make_value(line, type_key) for line in f.readlines() if not line ]
+    values = [ make_value(line, type_key) for line in f.readlines() if line ]
     f.close()
     if not values:
         print "alert"

@@ -3,7 +3,7 @@ __author__ = 'badpoet'
 import json
 import pymongo
 import pyhocon
-from flask import Flask, request
+from flask import Flask, request, abort
 
 app = Flask(__name__)
 
@@ -21,6 +21,33 @@ db = pymongo.Connection(
 #     conf.get_string('db.mongo.pw'),
 # )
 w_col = db["w"]
+w_col.ensure_index([("type_key", pymongo.ASCENDING), ("date", pymongo.ASCENDING), ("hour", pymongo.ASCENDING)])
+TIMESTAMP_ASCENDING = [("date", pymongo.ASCENDING), ("hour", pymongo.ASCENDING)]
+TIMESTAMP_DESCENDING = [("date", pymongo.DESCENDING), ("hour", pymongo.DESCENDING)]
+w_col.ensure_index(TIMESTAMP_ASCENDING)
+w_col.ensure_index(TIMESTAMP_DESCENDING)
+
+
+@app.route("/timestamp", methods=["GET"])
+def timestamp_range():
+    token = request.args.get("token", "")
+    if not token == TOKEN:
+        return abort(403)
+    a = w_col.find_one(sort=TIMESTAMP_ASCENDING)
+    b = w_col.find_one(sort=TIMESTAMP_DESCENDING)
+    if not a or not b:
+        res = {
+            "status": "none"
+        }
+        return json.dumps(res)
+    res = {
+        "status": "ok",
+        "date_a": a["date"],
+        "hour_a": a["hour"],
+        "date_b": b["date"],
+        "hour_b": b["hour"]
+    }
+    return json.dumps(res)
 
 
 @app.route("/data/<q_type>/<q_date>/<q_hour>", methods=["GET"])

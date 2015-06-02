@@ -39,7 +39,10 @@ for each in file_name_list:
     cnt = 0
     for line in f.readlines():
         if not line: continue
-        obj = json.loads(line)
+        try:
+            obj = json.loads(line)
+        except Exception, e:
+            continue
         obj["geo_key"] = gk_dict[obj["city"]]
         if wrapper.accept(obj):
             cnt += 1

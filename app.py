@@ -54,6 +54,7 @@ def timestamp_range():
 
 @app.route("/data/<q_type>/<q_year>/<q_date>/<q_hour>", methods=["GET"])
 def query(q_type, q_year, q_date, q_hour):
+    print "QUERY IN", q_type, q_year, q_date, q_hour
     token = request.args.get("token", "")
     if not token == TOKEN:
         res = {
@@ -78,6 +79,7 @@ def query(q_type, q_year, q_date, q_hour):
         "status": "ok",
         "result": result["value"]
     }
+    print "QUERY OUT", q_type, q_year, q_date, q_hour
     return json.dumps(res, ensure_ascii=False)
 
 

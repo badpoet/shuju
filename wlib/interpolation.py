@@ -68,6 +68,7 @@ if __name__ == "__main__":
     while True:
         print "Interpolate", base.strftime("%Y%m%d%H")
         interpolator.interpolate(base.year, base.month, base.day, base.hour)
+        print "Interpolated"
         base += timedelta(hours=1)
         if base > datetime.now() - timedelta(hours=1.5):
             sleep(3600)

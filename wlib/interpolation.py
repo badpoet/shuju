@@ -34,8 +34,7 @@ class Interpolator(object):
         cnt = 0
         for gk in self.gk_dict.values():
             lat, long = map(float, gk.split("+"))
-            print lat
-            print long
+            print {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$lt", timestamp}}
             left = self.raw_col.find_one(
                 {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$lt", timestamp}})
             right = self.raw_col.find_one(

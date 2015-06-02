@@ -48,7 +48,10 @@ class WeatherCnWrapper(object):
     def accept(self, obj):
         gk = obj["geo_key"]
         # timestamp = datetime.now().strftime("%m%d%H%M")
-        timestamp = self.guess_date(obj["time"]) + obj["time"][:2] + obj["time"][3:]
+        try:
+            timestamp = self.guess_date(obj["time"]) + obj["time"][:2] + obj["time"][3:]
+        except Exception, e:
+            return False
         t = self.accept_wind(gk, timestamp, obj)
         t = t and self.accept_rain(gk, timestamp, obj)
         t = t and self.accept_temp(gk, timestamp, obj)

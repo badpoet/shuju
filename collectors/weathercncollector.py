@@ -5,6 +5,137 @@ import json
 import requests
 from time import sleep
 from exception import WrongPage
+import clients.mongo
+import clients
+from datetime import datetime, timedelta
+
+class WeatherCnWrapper(object):
+
+    rain_table = {
+        "no live": 0,
+        "sunny": 0,
+        "cloudy": 0,
+        "overcast": 0,
+        "foggy": 0,
+        "haze": 0,
+        "dust": 0,
+        "duststorm": 0,
+        "sleet": 0,
+        "sand": 0,
+        "shower": 1,
+        "thundershower": 2,
+        "thundershower with hail": 2,
+        "light rain": 3,
+        "moderate rain": 4,
+        "heavy rain": 5,
+        "light snow": 2,
+        "moderate snow": 3,
+        "snow": 3,
+        "snow flurry": 4
+    }
+
+    def __init__(self, conf=None):
+        if not conf:
+            return
+        self.db = clients.mongo.connection(conf)
+        self.tz_offset = conf.get_int("app.tz_offset")
+        self.col = self.db["raw"]
+
+    def accept(self, obj):
+        gk = obj["geo_key"]
+        # timestamp = datetime.now().strftime("%m%d%H%M")
+        timestamp = self.guess_date(obj["time"]) + obj["time"][:2] + obj["time"][3:]
+        self.accept_wind(gk, timestamp, obj)
+        self.accept_rain(gk, timestamp, obj)
+        self.accept_temp(gk, timestamp, obj)
+        self.accept_humid(gk, timestamp, obj)
+        self.accept_aqi(gk, timestamp, obj)
+
+    def accept_wind(self, gk, timestamp, obj):
+        try:
+            wde = obj["wde"].strip()
+            if wde == "N":
+                d = (0, -1)
+            elif wde == "NE":
+                d = (-1, -1)
+            elif wde == "E":
+                d = (-1, 0)
+            elif wde == "SE":
+                d = (-1, 1)
+            elif wde == "S":
+                d = (0, 1)
+            elif wde == "SW":
+                d = (1, 1)
+            elif wde == "W":
+                d = (1, 0)
+            elif wde == "NW":
+                d = (1, -1)
+            else:
+                raise Exception
+            wse = int(obj["WS"].strip()[:-1])
+            wsa = float(wse) / (d[0] ** 2 + d[1] ** 2) ** 0.5
+            w = (wsa * d[0], wsa * d[1])
+            self.update("wind", gk, timestamp, (w[0], w[1]))
+        except Exception, e:
+            return
+
+    def accept_rain(self, gk, timestamp, obj):
+        try:
+            w = obj["weathere"].lower().strip()
+            n = WeatherCnWrapper.rain_table[w]
+            self.update("rain", gk, timestamp, n)
+        except Exception, e:
+            s = obj.get("weathere", "").lower().strip()
+            if s:
+                print s
+            return
+
+    def accept_temp(self, gk, timestamp, obj):
+        try:
+            temp = float(obj["temp"])
+            self.update("temp", gk, timestamp, temp)
+        except Exception, e:
+            return
+
+    def accept_humid(self, gk, timestamp, obj):
+        try:
+            humid = obj["sd"].strip()
+            if humid[-1] != "%": raise Exception()
+            self.update("humid", gk, timestamp, float(humid[:-1]))
+        except Exception, e:
+            return
+
+    def accept_aqi(self, gk, timestamp, obj):
+        try:
+            aqi = int(obj["aqi"])
+            self.update("aqi", gk, timestamp, aqi)
+        except Exception, e:
+            return
+
+    def update(self, base, gk, timestamp, value):
+        lat, long = gk.split("+")
+        lat = float(lat)
+        long = float(long)
+        self.col.insert({
+            "lat": lat,
+            "long": long,
+            "timestamp": timestamp,
+            "type_key": base,
+            "value": value
+        })
+
+    def make_gk(self, lat, long):
+        lat = int(round(lat * 100)) / 100.0
+        long = int(round(long * 100)) / 100.0
+        return str(lat) + "+" + str(long)
+
+    def guess_date(self, t, base=datetime.now()):
+        base += timedelta(self.tz_offset)
+        t1 = datetime(base.year, base.month, base.day, int(t[:2]), int(t[3:]))
+        if t1 > base:
+            t1 = t1 - timedelta(days=1)
+        return t1.strftime("%m%d")
+
 
 class WeatherCnCollector(object):
 
@@ -56,7 +187,7 @@ class WeatherCnCollector(object):
         silence = 30
         last_exception = None
         timeout = 2
-        while cnt < MAX_TRY:
+        while cnt < WeatherCnCollector.MAX_TRY:
             try:
                 return self.fetch_once(self.make_url(cid), self.make_headers(cid), timeout)
             except requests.Timeout, e:
@@ -71,7 +202,7 @@ class WeatherCnCollector(object):
                 last_exception = e
         print last_exception
 
-    def fetch_all(self, wrapper = None):
+    def fetch_all(self, wrapper):
         city_tuples = self.city_tuples
         tot = len(city_tuples)
         cnt = 0
@@ -85,16 +216,17 @@ class WeatherCnCollector(object):
                     print pr, obj["cityname"].encode("utf8"), obj["time"].encode("utf8")
                     obj["lat"] = lat
                     obj["long"] = long
-                    if wrapper:
-                        obj["geo_key"] = wrapper.make_gk(lat, long)
-                        wrapper.accept(obj)
-                        wrapper.log(pr + json.dumps(obj, ensure_ascii=False), type="log")
+                    obj["geo_key"] = wrapper.make_gk(lat, long)
+                    wrapper.accept(obj)
                 except Exception, e:
                     print e
                     print obj
             else:
                 print pr, "failed on", cid
-                if wrapper:
-                    wrapper.log(pr + "failed on " + cid, type="err")
 
-
+if __name__ == "__main__":
+    conf = clients.get_conf()
+    wrapper = WeatherCnWrapper(conf)
+    collector = WeatherCnCollector()
+    while True:
+        collector.fetch_all(wrapper)

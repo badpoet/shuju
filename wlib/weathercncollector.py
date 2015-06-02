@@ -49,11 +49,12 @@ class WeatherCnWrapper(object):
         gk = obj["geo_key"]
         # timestamp = datetime.now().strftime("%m%d%H%M")
         timestamp = self.guess_date(obj["time"]) + obj["time"][:2] + obj["time"][3:]
-        self.accept_wind(gk, timestamp, obj)
-        self.accept_rain(gk, timestamp, obj)
-        self.accept_temp(gk, timestamp, obj)
-        self.accept_humid(gk, timestamp, obj)
-        self.accept_aqi(gk, timestamp, obj)
+        t = self.accept_wind(gk, timestamp, obj)
+        t = t and self.accept_rain(gk, timestamp, obj)
+        t = t and self.accept_temp(gk, timestamp, obj)
+        t = t and self.accept_humid(gk, timestamp, obj)
+        t = t and self.accept_aqi(gk, timestamp, obj)
+        return t
 
     def accept_wind(self, gk, timestamp, obj):
         try:
@@ -81,7 +82,8 @@ class WeatherCnWrapper(object):
             w = (wsa * d[0], wsa * d[1])
             self.update("wind", gk, timestamp, (w[0], w[1]))
         except Exception, e:
-            return
+            return False
+        return True
 
     def accept_rain(self, gk, timestamp, obj):
         try:
@@ -92,14 +94,16 @@ class WeatherCnWrapper(object):
             s = obj.get("weathere", "").lower().strip()
             if s:
                 print s
-            return
+            return False
+        return True
 
     def accept_temp(self, gk, timestamp, obj):
         try:
             temp = float(obj["temp"])
             self.update("temp", gk, timestamp, temp)
         except Exception, e:
-            return
+            return False
+        return True
 
     def accept_humid(self, gk, timestamp, obj):
         try:
@@ -107,14 +111,16 @@ class WeatherCnWrapper(object):
             if humid[-1] != "%": raise Exception()
             self.update("humid", gk, timestamp, float(humid[:-1]))
         except Exception, e:
-            return
+            return False
+        return True
 
     def accept_aqi(self, gk, timestamp, obj):
         try:
             aqi = int(obj["aqi"])
             self.update("aqi", gk, timestamp, aqi)
         except Exception, e:
-            return
+            return False
+        return True
 
     def update(self, base, gk, timestamp, value):
         lat, long = gk.split("+")

@@ -42,6 +42,8 @@ class WeatherCnWrapper(object):
         self.db = clients.mongo.connection(conf)
         self.tz_offset = conf.get_int("app.tz_offset")
         self.col = self.db["raw"]
+        self.col.ensure_index([("lat", 1), ("long", 1), ("timestamp", 1)])
+        self.col.ensure_index([("lat", 1), ("long", 1), ("timestamp", -1)])
 
     def accept(self, obj):
         gk = obj["geo_key"]
@@ -136,7 +138,7 @@ class WeatherCnWrapper(object):
         t1 = datetime(base.year, base.month, base.day, int(t[:2]), int(t[3:]))
         if t1 > base:
             t1 = t1 - timedelta(days=1)
-        return t1.strftime("%m%d")
+        return t1.strftime("%Y%m%d")
 
 
 class WeatherCnCollector(object):

@@ -213,7 +213,7 @@ class WeatherCnCollector(object):
         cnt = 0
         for cid, p, d, s, lat, long in city_tuples:
             cnt += 1
-            if cnt % partition[0] != partition[1]:
+            if cnt % partition[0] != partition[1] - 1:
                 continue
             sleep(0.5)
             obj = self.fetch_page(cid)

@@ -2,12 +2,14 @@ __author__ = 'badpoet'
 
 import codecs
 import json
-import requests
 from time import sleep
-from exception import WrongPage
-import clients.mongo
-import clients
 from datetime import datetime, timedelta
+
+import requests
+
+from exception import WrongPage
+import clients
+import clients.mongo
 
 class WeatherCnWrapper(object):
 

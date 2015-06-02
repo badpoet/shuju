@@ -145,7 +145,8 @@ class WeatherCnCollector(object):
 
     MAX_TRY = 3
 
-    def __init__(self):
+    def __init__(self, partition):
+        self. partition = partition
         self.headers = {
             "Host": "d1.weather.com.cn",
             "Connection": "keep-alive",
@@ -212,6 +213,8 @@ class WeatherCnCollector(object):
         cnt = 0
         for cid, p, d, s, lat, long in city_tuples:
             cnt += 1
+            if cnt % partition[0] != partition[1]:
+                continue
             sleep(0.5)
             obj = self.fetch_page(cid)
             pr = str(cnt) + "/" + str(tot) + " "
@@ -229,8 +232,13 @@ class WeatherCnCollector(object):
                 print pr, "failed on", cid
 
 if __name__ == "__main__":
+    import sys
     conf = clients.get_conf()
     wrapper = WeatherCnWrapper(conf)
-    collector = WeatherCnCollector()
+    if len(sys.argv) == 3:
+        partition = (int(sys.argv[1]), int(sys.argv[2]))
+    else:
+        partition = (1, 1)
+    collector = WeatherCnCollector(partition)
     while True:
         collector.fetch_all(wrapper)

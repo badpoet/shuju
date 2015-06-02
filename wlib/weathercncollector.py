@@ -133,7 +133,11 @@ class WeatherCnWrapper(object):
         long = int(round(long * 100)) / 100.0
         return str(lat) + "+" + str(long)
 
-    def guess_date(self, t, base=datetime.now()):
+    def get_time(self):
+        return datetime.now()
+
+    def guess_date(self, t):
+        base = self.get_time()
         base += timedelta(hours=self.tz_offset)
         t1 = datetime(base.year, base.month, base.day, int(t[:2]), int(t[3:]))
         if t1 > base:

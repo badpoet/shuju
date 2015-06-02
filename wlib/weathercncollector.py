@@ -218,7 +218,7 @@ class WeatherCnCollector(object):
                     print pr, obj["cityname"].encode("utf8"), obj["time"].encode("utf8")
                     obj["lat"] = lat
                     obj["long"] = long
-                    obj["geo_key"] = wrapper.make_gk(lat, long)
+                    obj["geo_key"] = wrapper.make_gk(float(lat), float(long))
                     wrapper.accept(obj)
                 except Exception, e:
                     print e

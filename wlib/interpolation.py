@@ -17,7 +17,7 @@ class Interpolator(object):
         self.ASC = [("lat", 1), ("long", 1), ("timestamp", 1)]
 
     def interpolate(self, year, month, day, hour):
-        timestamp = datetime(year, month, day, hour).strftime("%Y%m%d%H")
+        timestamp = datetime(year, month, day, hour).strftime("%Y%m%d%H") + "00"
         cnt = 0
         cnt += self.interpolate_one("rain", timestamp)
         cnt += self.interpolate_one("temp", timestamp)
@@ -33,6 +33,8 @@ class Interpolator(object):
         cnt = 0
         for gk in self.gk_dict.values():
             lat, long = map(float, gk.split("+"))
+            print lat
+            print long
             left = self.raw_col.find_one({"lat": lat, "long": long, "timestamp": {"$lt", timestamp}}, sort=self.DES)
             right = self.raw_col.find_one({"lat": lat, "long": long, "timestamp": {"$gt", timestamp}}, sort=self.ASC)
             if not left or not right:

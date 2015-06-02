@@ -9,6 +9,7 @@ import requests
 
 from exception import WrongPage
 import clients
+from clients import make_gk
 import clients.mongo
 
 class WeatherCnWrapper(object):
@@ -137,10 +138,6 @@ class WeatherCnWrapper(object):
             "value": value
         })
 
-    def make_gk(self, lat, long):
-        lat = int(round(lat * 100)) / 100.0
-        long = int(round(long * 100)) / 100.0
-        return str(lat) + "+" + str(long)
 
     def get_time(self):
         return datetime.now()
@@ -236,7 +233,7 @@ class WeatherCnCollector(object):
                     print pr, obj["cityname"].encode("utf8"), obj["time"].encode("utf8")
                     obj["lat"] = lat
                     obj["long"] = long
-                    obj["geo_key"] = wrapper.make_gk(float(lat), float(long))
+                    obj["geo_key"] = make_gk(float(lat), float(long))
                     wrapper.accept(obj)
                 except Exception, e:
                     print e

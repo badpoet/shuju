@@ -57,9 +57,9 @@ for each in file_name_list:
 
     data_key = {
         "type_key": type_key,
-        "date": date,
-        "hour": hour,
-        "year": "2015"
+        "date": int(date),
+        "hour": int(hour),
+        "year": 2015
     }
     w_col.update(
         data_key,

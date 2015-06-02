@@ -3,6 +3,7 @@ import sys
 sys.path.append(".")
 
 import wlib.clients
+from wlib.clients import make_gk
 import wlib.clients.mongo
 from wlib.weathercncollector import WeatherCnWrapper
 from datetime import datetime
@@ -21,7 +22,7 @@ file_name_list = os.listdir(dir)
 gk_dict = {}
 for info in codecs.open("resources/city_gib.txt", "r", "utf8"):
     cid, p, d, c, lat, long = info.strip().split()
-    gk_dict[cid] = wrapper.make_gk(float(lat), float(long))
+    gk_dict[cid] = make_gk(float(lat), float(long))
 
 file_name_list.sort()
 for each in file_name_list:

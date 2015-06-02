@@ -52,12 +52,12 @@ class WeatherCnWrapper(object):
             timestamp = self.guess_date(obj["time"]) + obj["time"][:2] + obj["time"][3:]
         except Exception, e:
             return False
-        t = self.accept_wind(gk, timestamp, obj)
-        t = t and self.accept_rain(gk, timestamp, obj)
-        t = t and self.accept_temp(gk, timestamp, obj)
-        t = t and self.accept_humid(gk, timestamp, obj)
-        t = t and self.accept_aqi(gk, timestamp, obj)
-        return t
+        self.accept_wind(gk, timestamp, obj)
+        self.accept_rain(gk, timestamp, obj)
+        self.accept_temp(gk, timestamp, obj)
+        self.accept_humid(gk, timestamp, obj)
+        self.accept_aqi(gk, timestamp, obj)
+        return True
 
     def accept_wind(self, gk, timestamp, obj):
         try:

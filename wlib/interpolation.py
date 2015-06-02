@@ -12,9 +12,10 @@ class Interpolator(object):
         self.raw_col = db["raw"]
         self.w_col = db["w2"]
         self.w_col.ensure_index([("type_key", 1), ("timestamp", 1)])
+        self.w_col.ensure_index([("type_key", 1), ("timestamp", -1)])
         self.gk_dict = clients.gk_dict
-        self.DES = [("lat", 1), ("long", 1), ("timestamp", -1)]
-        self.ASC = [("lat", 1), ("long", 1), ("timestamp", 1)]
+        self.DES = [("timestamp", -1)]
+        self.ASC = [("timestamp", 1)]
 
     def interpolate(self, year, month, day, hour):
         timestamp = datetime(year, month, day, hour).strftime("%Y%m%d%H") + "00"
@@ -35,8 +36,10 @@ class Interpolator(object):
             lat, long = map(float, gk.split("+"))
             print lat
             print long
-            left = self.raw_col.find_one({"lat": lat, "long": long, "timestamp": {"$lt", timestamp}}, sort=self.DES)
-            right = self.raw_col.find_one({"lat": lat, "long": long, "timestamp": {"$gt", timestamp}}, sort=self.ASC)
+            left = self.raw_col.find_one(
+                {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$lt", timestamp}})
+            right = self.raw_col.find_one(
+                {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$gt", timestamp}})
             if not left or not right:
                 continue
             lv = left["value"]
@@ -63,7 +66,7 @@ class Interpolator(object):
 if __name__ == "__main__":
     conf = clients.get_conf()
     interpolator = Interpolator(conf)
-    base = datetime(2015, 5, 11, 0)
+    base = datetime(2015, 5, 11, 12)
     while True:
         print "Interpolate", base.strftime("%Y%m%d%H")
         interpolator.interpolate(base.year, base.month, base.day, base.hour)

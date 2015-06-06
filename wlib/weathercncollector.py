@@ -43,8 +43,8 @@ class WeatherCnWrapper(object):
         self.db = clients.mongo.connection(conf)
         self.tz_offset = conf.get_int("app.tz_offset")
         self.col = self.db["raw"]
-        self.col.ensure_index([("lat", 1), ("long", 1), ("timestamp", 1)])
-        self.col.ensure_index([("lat", 1), ("long", 1), ("timestamp", -1)])
+        self.col.ensure_index([("type_key", 1), ("lat", 1), ("long", 1), ("timestamp", 1)])
+        self.col.ensure_index([("type_key", 1), ("lat", 1), ("long", 1), ("timestamp", -1)])
 
     def accept(self, obj):
         gk = obj["geo_key"]

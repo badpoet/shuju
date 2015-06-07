@@ -102,7 +102,8 @@ class PmInWrapper(object):
 
     def accept(self, obj):
         stamp = self.make_timestamp(obj["date"], obj["time"])
-        lat, long = self.get_loc(obj["city"])
+        geo_key = self.get_loc(obj["city"])
+        lat, long = map(float, geo_key.split("+"))
         self.col.update({
             "timestamp": stamp,
             "lat": lat,

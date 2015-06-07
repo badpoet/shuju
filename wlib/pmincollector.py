@@ -93,9 +93,9 @@ class PmInWrapper(object):
             else:
                 return gkc_dict[city_std[city]]
         except Exception, e:
+            print e
             print city
             print [city]
-            print e
 
     def make_timestamp(self, date, time):
         return date[0:4] + date[5:7] + date[8:10] + time[0:2] + "00"

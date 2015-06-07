@@ -15,9 +15,17 @@ def make_gk(lat, long):
 import codecs
 
 gk_dict = {}
-for info in codecs.open("resources/city_gib.txt", "r", "utf8"):
+gkc_dict = {}
+for info in codecs.open("resources/city_gib.txt", "r", "utf8").readlines():
     cid, p, d, c, lat, long = info.strip().split()
     gk_dict[cid] = make_gk(float(lat), float(long))
+    gkc_dict[c] = make_gk(float(lat), float(long))
+
+
+city_std = {}
+for t in codecs.open("resources/city_std.txt", "r", "utf8").readlines():
+    a, b = t.strip().split()
+    city_std[a] = b
 
 
 from datetime import datetime

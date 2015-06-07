@@ -13,6 +13,7 @@ class Interpolator(object):
         self.w_col = db["w2"]
         self.w_col.ensure_index([("type_key", 1), ("timestamp", 1)])
         self.w_col.ensure_index([("type_key", 1), ("timestamp", -1)])
+        self.w_col.ensure_index([("type_key", 1), ("lat", 1), ("long", 1), ("timestamp", 1)])
         self.gk_dict = clients.gk_dict
         self.DES = [("timestamp", -1)]
         self.ASC = [("timestamp", 1)]
@@ -25,6 +26,8 @@ class Interpolator(object):
         cnt += self.interpolate_one("humid", timestamp)
         cnt += self.interpolate_one("aqi", timestamp)
         cnt += self.interpolate_one("wind", timestamp)
+        cnt += self.interpolate_one("pm2_5", timestamp)
+        cnt += self.interpolate_one("pm10", timestamp)
         return cnt
 
     def interpolate_data(self, ya, yb, xa, xb):
@@ -33,22 +36,27 @@ class Interpolator(object):
     def interpolate_one(self, type_key, timestamp):
         cnt = 0
         for gk in self.gk_dict.values():
+            sts = timestamp[:10]
             lat, long = map(float, gk.split("+"))
-            left = self.raw_col.find_one(
-                {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$lt": timestamp}}, sort=self.DES)
-            right = self.raw_col.find_one(
-                {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$gt": timestamp}}, sort=self.ASC)
-            if not left or not right:
-                continue
-            lv = left["value"]
-            rv = right["value"]
-            base = clients.stamp_to_obj(timestamp)
-            lt = (clients.stamp_to_obj(left["timestamp"]) - base).seconds
-            rt = (clients.stamp_to_obj(right["timestamp"]) - base).seconds
-            if type_key == "wind":
-                v = (self.interpolate_data(lv[0], rv[0], lt, rt), self.interpolate_data(lv[1], rv[1], lt, rt))
+            fo = self.raw_col.find_one({"type_key": type_key, "timestamp": timestamp, "lat": lat, "long": long})
+            if not fo == None:
+                v = fo["value"]
             else:
-                v = self.interpolate_data(lv, rv, lt, rt)
+                left = self.raw_col.find_one(
+                    {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$lt": timestamp}}, sort=self.DES)
+                right = self.raw_col.find_one(
+                    {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$gt": timestamp}}, sort=self.ASC)
+                if not left or not right:
+                    continue
+                lv = left["value"]
+                rv = right["value"]
+                base = clients.stamp_to_obj(timestamp)
+                lt = (clients.stamp_to_obj(left["timestamp"]) - base).seconds
+                rt = (clients.stamp_to_obj(right["timestamp"]) - base).seconds
+                if type_key == "wind":
+                    v = (self.interpolate_data(lv[0], rv[0], lt, rt), self.interpolate_data(lv[1], rv[1], lt, rt))
+                else:
+                    v = self.interpolate_data(lv, rv, lt, rt)
             self.w_col.update({
                 "timestamp": timestamp[:10],
                 "type_key": type_key,

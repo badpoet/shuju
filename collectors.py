@@ -163,7 +163,7 @@ class Pm25InClient(object):
 
 
 def sleep_to_next_hour():
-    t = (65 - datetime.now().minute) * 60.0
+    t = (75 - datetime.now().minute) * 60.0
     print "sleep", t, "seconds"
     sleep(t)
 

@@ -37,6 +37,7 @@ for each in file_name_list:
     cnt = 0
     obj = json.load(f)
     for each in obj:
+        cnt += 1
         wrapper.accept(each)
     f.close()
     print cnt, "docs accepted"

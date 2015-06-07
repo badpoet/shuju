@@ -84,13 +84,18 @@ class PmInWrapper(object):
         self.col.ensure_index([("type_key", 1), ("lat", 1), ("long", 1), ("timestamp", -1)])
 
     def get_loc(self, city):
-        if city not in city_std:
-            if city not in gkc_dict:
-                return None
+        try:
+            if city not in city_std:
+                if city not in gkc_dict:
+                    raise Exception
+                else:
+                    return gkc_dict[city]
             else:
-                return gkc_dict[city]
-        else:
-            return gkc_dict[city_std[city]]
+                return gkc_dict[city_std[city]]
+        except Exception, e:
+            print city
+            print [city]
+            print e
 
     def make_timestamp(self, date, time):
         return date[0:4] + date[5:7] + date[8:10] + time[0:2] + "00"

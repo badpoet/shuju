@@ -22,11 +22,14 @@ db = pymongo.Connection(
 # )
 w_col = db["w"]
 w2_col = db["w2"]
-w_col.ensure_index([("type_key", 1), ("year", 1), ("date", 1), ("hour", 1)])
 TIMESTAMP_ASCENDING = [("year", 1), ("date", 1), ("hour", 1)]
 TIMESTAMP_DESCENDING = [("year", -1), ("date", -1), ("hour", -1)]
+w_col.ensure_index([("type_key", 1), ("year", 1), ("date", 1), ("hour", 1)])
 w_col.ensure_index(TIMESTAMP_ASCENDING)
 w_col.ensure_index(TIMESTAMP_DESCENDING)
+w2_col.ensure_index([("type_key", 1), ("year", 1), ("date", 1), ("hour", 1)])
+w2_col.ensure_index(TIMESTAMP_ASCENDING)
+w2_col.ensure_index(TIMESTAMP_DESCENDING)
 
 
 @app.route("/timestamp", methods=["GET"])

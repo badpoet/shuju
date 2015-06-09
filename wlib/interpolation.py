@@ -71,16 +71,18 @@ class Interpolator(object):
         return cnt
 
 
+import sys
 if __name__ == "__main__":
     conf = clients.get_conf()
     interpolator = Interpolator(conf)
-    base = datetime(2015, 5, 11, 12)
+    year, month, day, hour = map(int, sys.argv[1:])
+    base = datetime(year, month, day, hour)
     while True:
         t1 = datetime.now()
         print "Interpolate", base.strftime("%Y%m%d%H")
         interpolator.interpolate(base.year, base.month, base.day, base.hour)
         print "Interpolated", (datetime.now() - t1).total_seconds()
         base += timedelta(hours=1)
-        if base > datetime.now() - timedelta(hours=1.5):
+        if base > (datetime.now() - timedelta(hours=1.5)):
             print "sleeping"
             sleep(3600)

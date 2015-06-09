@@ -34,8 +34,8 @@ def timestamp_range():
     token = request.args.get("token", "")
     if not token == TOKEN:
         return abort(403)
-    a = w_col.find_one(sort=TIMESTAMP_ASCENDING)
-    b = w_col.find_one(sort=TIMESTAMP_DESCENDING)
+    a = w2_col.find_one(sort=TIMESTAMP_ASCENDING)
+    b = w2_col.find_one(sort=TIMESTAMP_DESCENDING)
     if not a or not b:
         res = {
             "status": "none"
@@ -83,6 +83,8 @@ def query(q_type, q_year, q_date, q_hour):
     print "QUERY OUT", q_type, q_year, q_date, q_hour
     return json.dumps(res, ensure_ascii=False)
 
+import sys
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=9001, debug=True)
+    port = int(sys.argv[1])
+    app.run(host="0.0.0.0", port=port, debug=True)

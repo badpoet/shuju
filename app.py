@@ -83,5 +83,7 @@ def query(q_type, q_year, q_date, q_hour):
     return json.dumps(res, ensure_ascii=False)
 
 
+import sys
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=9000, debug=True)
+    port = int(sys.argv[1])
+    app.run(host="0.0.0.0", port=port, debug=True)

@@ -130,13 +130,13 @@ class WeatherCnWrapper(object):
         lat, long = gk.split("+")
         lat = float(lat)
         long = float(long)
-        self.col.insert({
+        self.col.update({
             "lat": lat,
             "long": long,
             "timestamp": timestamp,
-            "type_key": base,
-            "value": value
-        })
+            "date": timestamp[0:8],
+            "type_key": base
+        }, {"$set": {"value": value}}, upsert=True)
 
 
     def get_time(self):

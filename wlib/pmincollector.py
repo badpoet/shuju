@@ -80,8 +80,9 @@ class PmInWrapper(object):
         self.db = clients.mongo.connection(conf)
         self.tz_offset = conf.get_int("app.tz_offset")
         self.col = self.db["raw"]
-        self.col.ensure_index([("type_key", 1), ("lat", 1), ("long", 1), ("timestamp", 1)])
-        self.col.ensure_index([("type_key", 1), ("lat", 1), ("long", 1), ("timestamp", -1)])
+        self.col.ensure_index([("type_key", 1), ("lat", 1), ("long", 1), ("date", 1), ("timestamp", 1)])
+        self.col.ensure_index([("type_key", 1), ("lat", 1), ("long", 1), ("date", -1), ("timestamp", -1)])
+        self.col.ensure_index([("timestamp", 1)])
 
     def get_loc(self, city):
         try:
@@ -106,6 +107,7 @@ class PmInWrapper(object):
         lat, long = map(float, geo_key.split("+"))
         self.col.update({
             "timestamp": stamp,
+            "date": stamp[0:8],
             "lat": lat,
             "long": long,
             "type_key": obj["type"]

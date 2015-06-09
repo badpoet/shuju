@@ -28,10 +28,12 @@ TIMESTAMP_DESCENDING = [("year", -1), ("date", -1), ("hour", -1)]
 w_col.ensure_index(TIMESTAMP_ASCENDING)
 w_col.ensure_index(TIMESTAMP_DESCENDING)
 w2_col.ensure_index([("type_key", 1), ("timestamp", 1)])
+w2_col.ensure_index([("timestamp", 1)])
 
 
 @app.route("/timestamp", methods=["GET"])
 def timestamp_range():
+    print "STAMP IN"
     token = request.args.get("token", "")
     if not token == TOKEN:
         return abort(403)
@@ -53,6 +55,7 @@ def timestamp_range():
         "hour_b": b[8:10],
         "year_b": b[0:4]
     }
+    print "STAMP OUT"
     return json.dumps(res)
 
 

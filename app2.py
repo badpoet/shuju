@@ -22,14 +22,12 @@ db = pymongo.Connection(
 # )
 w_col = db["w"]
 w2_col = db["w2"]
+w_col.ensure_index([("type_key", 1), ("year", 1), ("date", 1), ("hour", 1)])
 TIMESTAMP_ASCENDING = [("year", 1), ("date", 1), ("hour", 1)]
 TIMESTAMP_DESCENDING = [("year", -1), ("date", -1), ("hour", -1)]
-w_col.ensure_index([("type_key", 1), ("year", 1), ("date", 1), ("hour", 1)])
 w_col.ensure_index(TIMESTAMP_ASCENDING)
 w_col.ensure_index(TIMESTAMP_DESCENDING)
-w2_col.ensure_index([("type_key", 1), ("year", 1), ("date", 1), ("hour", 1)])
-w2_col.ensure_index(TIMESTAMP_ASCENDING)
-w2_col.ensure_index(TIMESTAMP_DESCENDING)
+w2_col.ensure_index([("type_key", 1), ("timestamp", 1)])
 
 
 @app.route("/timestamp", methods=["GET"])
@@ -37,8 +35,8 @@ def timestamp_range():
     token = request.args.get("token", "")
     if not token == TOKEN:
         return abort(403)
-    a = w2_col.find_one(sort=TIMESTAMP_ASCENDING)
-    b = w2_col.find_one(sort=TIMESTAMP_DESCENDING)
+    a = w2_col.find_one(sort=[("timestamp", 1)])
+    b = w2_col.find_one(sort=[("timestamp", -1)])
     if not a or not b:
         res = {
             "status": "none"

@@ -28,7 +28,7 @@ for t in codecs.open("resources/city_std.txt", "r", "utf8").readlines():
     city_std[a] = b
 
 
-from datetime import datetime
+from datetime import datetime, timedelta
 def stamp_to_obj(stamp):
     year = int(stamp[0:4])
     month = int(stamp[4:6])
@@ -37,3 +37,16 @@ def stamp_to_obj(stamp):
     minute = int(stamp[10:12])
     return datetime(year, month, day, hour, minute)
 
+
+def prev_date(stamp):
+    year = int(stamp[0:4])
+    month = int(stamp[4:6])
+    day = int(stamp[6:8])
+    return (datetime(year, month, day, 0, 0) - timedelta(days=1)).strftime("%Y%m%d")
+
+
+def next_date(stamp):
+    year = int(stamp[0:4])
+    month = int(stamp[4:6])
+    day = int(stamp[6:8])
+    return (datetime(year, month, day, 0, 0) + timedelta(days=1)).strftime("%Y%m%d")

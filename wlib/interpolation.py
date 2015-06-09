@@ -36,23 +36,25 @@ class Interpolator(object):
     def interpolate_one(self, type_key, timestamp):
         cnt = 0
         for gk in self.gk_dict.values():
-            sts = timestamp[:10]
             lat, long = map(float, gk.split("+"))
             fo = self.raw_col.find_one({"type_key": type_key, "timestamp": timestamp, "lat": lat, "long": long})
+            date = timestamp[:8]
+            d2 = clients.prev_date(date)
+            d3 = clients.next_date(date)
             if not fo == None:
                 v = fo["value"]
             else:
                 left = self.raw_col.find_one(
-                    {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$lt": timestamp}}, sort=self.DES)
+                    {"type_key": type_key, "lat": lat, "long": long, "date": {"$in": [date, d2]}}, sort=self.DES)
                 right = self.raw_col.find_one(
-                    {"type_key": type_key, "lat": lat, "long": long, "timestamp": {"$gt": timestamp}}, sort=self.ASC)
+                    {"type_key": type_key, "lat": lat, "long": long, "date": {"$in": [date, d3]}}, sort=self.ASC)
                 if not left or not right:
                     continue
                 lv = left["value"]
                 rv = right["value"]
                 base = clients.stamp_to_obj(timestamp)
-                lt = (clients.stamp_to_obj(left["timestamp"]) - base).seconds
-                rt = (clients.stamp_to_obj(right["timestamp"]) - base).seconds
+                lt = (clients.stamp_to_obj(left["timestamp"]) - base).total_seconds()
+                rt = (clients.stamp_to_obj(right["timestamp"]) - base).total_seconds()
                 if type_key == "wind":
                     v = (self.interpolate_data(lv[0], rv[0], lt, rt), self.interpolate_data(lv[1], rv[1], lt, rt))
                 else:
@@ -74,9 +76,11 @@ if __name__ == "__main__":
     interpolator = Interpolator(conf)
     base = datetime(2015, 5, 11, 12)
     while True:
+        t1 = datetime.now()
         print "Interpolate", base.strftime("%Y%m%d%H")
         interpolator.interpolate(base.year, base.month, base.day, base.hour)
-        print "Interpolated"
+        print "Interpolated", (datetime.now() - t1).total_seconds()
         base += timedelta(hours=1)
         if base > datetime.now() - timedelta(hours=1.5):
+            print "sleeping"
             sleep(3600)

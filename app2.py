@@ -42,6 +42,8 @@ def timestamp_range():
             "status": "none"
         }
         return json.dumps(res)
+    a = a["timestamp"]
+    b = b["timestamp"]
     res = {
         "status": "ok",
         "date_a": a[4:8],

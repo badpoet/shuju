@@ -13,6 +13,8 @@ date_bak = ""
 for each in db["raw"].find().sort([("timestamp", 1)]):
     mongo_id = each["_id"]
     date = each["timestamp"][:8]
+    if "date" in each:
+        continue
     if not date == date_bak:
         print date
         date_bak = date

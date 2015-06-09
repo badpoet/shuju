@@ -44,12 +44,12 @@ def timestamp_range():
         return json.dumps(res)
     res = {
         "status": "ok",
-        "date_a": a["date"],
-        "hour_a": a["hour"],
-        "year_a": a["year"],
-        "date_b": b["date"],
-        "hour_b": b["hour"],
-        "year_b": b["year"]
+        "date_a": a[4:8],
+        "hour_a": a[8:10],
+        "year_a": a[0:4],
+        "date_b": b[4:8],
+        "hour_b": b[8:10],
+        "year_b": b[0:4]
     }
     return json.dumps(res)
 

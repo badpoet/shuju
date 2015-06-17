@@ -31,6 +31,8 @@ class Interpolator(object):
         return cnt
 
     def interpolate_data(self, ya, yb, xa, xb):
+        if xa + xb < 1:
+            return (ya + yb) / 2.0
         return (ya * xb + yb * xa) / (xa + xb)
 
     def interpolate_one(self, type_key, timestamp):
